@@ -2,7 +2,8 @@ let VIDEO = null;
 let CANVAS = null;
 let CONTEXT = null;
 let SCALER = 0.8;
-let SIZE = { x: 0, y: 0, width: 0, height: 0 };
+let SIZE = { x: 0, y: 0, width: 0, height: 0, rows: 3, columns: 3 };
+let PIECES = [];
 
 function main() {
   CANVAS = document.getElementById("myCanvas");
@@ -45,4 +46,18 @@ function handleResize() {
 function updateCanvas() {
   CONTEXT.drawImage(VIDEO, SIZE.x, SIZE.y, SIZE.width, SIZE.height);
   window.requestAnimationFrame(updateCanvas);
+}
+
+function initializePieces() {
+  PIECES = [];
+  for (let i = 0; i < SIZE.rows; i++) {
+    for (let j = 0; j < SIZE.columns; j++);
+  }
+}
+
+class Piece {
+  constructor(rowIndex, colIndex) {
+    this.rowIndex = rowIndex;
+    this.colIndex = colIndex;
+  }
 }
