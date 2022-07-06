@@ -45,13 +45,19 @@ function handleResize() {
 
 function updateCanvas() {
   CONTEXT.drawImage(VIDEO, SIZE.x, SIZE.y, SIZE.width, SIZE.height);
+
+  for (let i = 0; i < PIECES.length; i++) {
+    PIECES[i].draw(CONTEXT);
+  }
   window.requestAnimationFrame(updateCanvas);
 }
 
 function initializePieces() {
   PIECES = [];
   for (let i = 0; i < SIZE.rows; i++) {
-    for (let j = 0; j < SIZE.columns; j++);
+    for (let j = 0; j < SIZE.columns; j++) {
+      PIECES.push(new Piece(i, j));
+    }
   }
 }
 
@@ -59,5 +65,10 @@ class Piece {
   constructor(rowIndex, colIndex) {
     this.rowIndex = rowIndex;
     this.colIndex = colIndex;
+  }
+  draw(context) {
+    context.beginPath();
+    context.rect(this.x, this.y, this.width, this.height);
+    context.stroke();
   }
 }
