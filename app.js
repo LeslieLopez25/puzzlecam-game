@@ -19,6 +19,7 @@ function main() {
       VIDEO.onloadeddata = function () {
         handleResize();
         // window.addEventListener("resize", handleResize);
+        initializePieces(SIZE.rows, SIZE.columns);
         updateCanvas();
       };
     })
@@ -44,7 +45,11 @@ function handleResize() {
 }
 
 function updateCanvas() {
+  CONTEXT.clearRect(0, 0, CANVAS.width, CANVAS.height);
+
+  CONTEXT.globalAlpha = 0.5;
   CONTEXT.drawImage(VIDEO, SIZE.x, SIZE.y, SIZE.width, SIZE.height);
+  CONTEXT.globalAlpha = 1;
 
   for (let i = 0; i < PIECES.length; i++) {
     PIECES[i].draw(CONTEXT);
@@ -52,12 +57,26 @@ function updateCanvas() {
   window.requestAnimationFrame(updateCanvas);
 }
 
-function initializePieces() {
+function initializePieces(rows, cols) {
+  SIZE.rows = rows;
+  SIZE.columns = cols;
+
   PIECES = [];
   for (let i = 0; i < SIZE.rows; i++) {
     for (let j = 0; j < SIZE.columns; j++) {
       PIECES.push(new Piece(i, j));
     }
+  }
+}
+
+function randomizePieces() {
+  for (let i = 0; i < PIECES.length; i++) {
+    let loc = {
+      x: Math.random() * (CANVAS.width - PIECES[i].width),
+      y: Math.random() * (CANVAS.height - PIECES[i].height),
+    };
+    PIECES[i].x = loc.x;
+    PIECES[i].y = loc.y;
   }
 }
 
@@ -68,6 +87,19 @@ class Piece {
   }
   draw(context) {
     context.beginPath();
+
+    context.drawImage(
+      VIDEO,
+      (this.colIndex * VIDEO.videoWidth) / SIZE.columns,
+      (this.rowIndex * VIDEO.videoHeight) / SIZE.rows,
+      VIDEO.videoWidth / SIZE.columns,
+      VIDEO.videoHeight / SIZE.rows,
+      this.x,
+      this.y,
+      this.width,
+      this.height
+    );
+
     context.rect(this.x, this.y, this.width, this.height);
     context.stroke();
   }
