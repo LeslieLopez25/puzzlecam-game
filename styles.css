@@ -33,6 +33,12 @@ button:hover {
     color: black;
 }
 
+button:disabled {
+    background: lightgray;
+    color: grey;
+    cursor: default;
+}
+
 select {
     font-size: 7vmin;
     cursor: pointer;
@@ -46,4 +52,16 @@ select {
     top: 0;
     left: 50%;
     transform: translate(-50%);
+}
+
+#scoresContainer {
+    height: 43vh;
+    overflow: auto;
+}
+
+input {
+    font-size: 7vmin;
+    border-radius: 1vmin;
+    width: 50%;
+    text-align: center;
 }

@@ -166,6 +166,7 @@ function onMouseUp() {
       let now = new Date().getTime();
       END_TIME = now;
       setTimeout(playMelody, 500);
+      showEndScreen();
     }
   }
   SELECTED_PIECE = null;
@@ -327,4 +328,93 @@ function playMelody() {
   setTimeout(function () {
     playNote(keys.MI, 600);
   }, 600);
+}
+
+function showEndScreen() {
+  const time = Math.floor(END_TIME - START_TIME) / 1000;
+  document.getElementById("scoreValue").innerHTML = "Score: " + time;
+  document.getElementById("endScreen").style.display = "block";
+  document.getElementById("saveBtn").innerHTML = "Save";
+  document.getElementById("saveBtn").disabled = false;
+}
+
+function showMenu() {
+  document.getElementById("endScreen").style.display = "none";
+  document.getElementById("menuItems").style.display = "block";
+}
+
+function showScores() {
+  document.getElementById("endScreen").style.display = "none";
+  document.getElementById("scoresScreen").style.display = "block";
+  document.getElementById("scoresContainer").innerHTML = "Loading...";
+  getScores();
+}
+
+function closeScores() {
+  document.getElementById("endScreen").style.display = "block";
+  document.getElementById("scoresScreen").style.display = "none";
+}
+
+function getScores() {
+  fetch("server.php").then(function (response) {
+    response.json().then(function (data) {
+      document.getElementById("scoresContainer").innerHTML = formatScores(data);
+    });
+  });
+}
+
+function saveScore() {
+  const time = END_TIME - START_TIME;
+  const name = document.getElementById("name".value);
+  if (name == "") {
+    alert("Enter your name!");
+    return;
+  }
+  const difficulty = document.getElementById("difficulty").value;
+
+  fetch(
+    'server.php?info={"name": "' +
+      name +
+      '",' +
+      '"time":' +
+      time +
+      "," +
+      '"difficulty":"' +
+      difficulty +
+      '"}'
+  ).then(function (response) {
+    document.getElementById("saveBtn").innerHTML = "OK!";
+  });
+  document.getElementById("saveBtn").disabled = true;
+}
+
+function formatScores(data) {
+  let html = "<table style='width:100%;text-align:center;'>";
+
+  html += formatScoresTable(data["easy"], "Easy");
+  html += formatScoresTable(data["medium"], "Medium");
+  html += formatScoresTable(data["hard"], "Hard");
+  html += formatScoresTable(data["insane"], "Insane");
+
+  return html;
+}
+
+function formatScoresTable(data, header) {
+  let html = "<tr style='background:rgb(123,146,196);color:white'>";
+  html += "<td></td><td><b>" + header + "</b></td><td><b>Time</b></td></tr>";
+
+  for (let i = 0; i < data.length; i++) {
+    html += "<tr>";
+    html +=
+      "<td>" +
+      (i + 1) +
+      ".</td><td title='" +
+      data[i]["Name"] +
+      "'>" +
+      data[i]["Name"] +
+      "</td><td>" +
+      Math.floor(data[i]["Time"] / 1000) +
+      "</td></tr>";
+  }
+  return html;
 }
