@@ -1,18 +1,18 @@
 <html>
 
 <head>
-    <title>Puzzle Cam</title>
+    <title> Puzzle Cam </title>
     <script src="app.js"></script>
-    <link rel="stylesheet" href="styles.css">
+    <link href="style.css" rel="stylesheet" />
 </head>
 
 <body onload="main()">
     <canvas id="myCanvas"></canvas>
-    <canvas id="helperCanvas" style="display: none;"></canvas>
+    <canvas id="helperCanvas" style="display:none;"></canvas>
     <div id="menuItems" class="menu">
         <div id="menu">
             <div id="controls">
-                <img src="logo.png" style="width:90%;">
+                <img src='logo.png' style='width:90%;' />
                 <br>
                 <br>
                 Difficulty <select id="difficulty" onchange="setDifficulty()">
@@ -28,8 +28,8 @@
         </div>
     </div>
 
-    <div id="endScreen" class="menu" style="display: none;">
-        <img src="logo.png" style="width: 90%;" />
+    <div id="endScreen" class="menu" style="display:none">
+        <img src='logo.png' style='width:90%;' />
         <br>
         <br>
 
@@ -42,8 +42,8 @@
         <button onclick="showMenu()">Menu</button>
     </div>
 
-    <div id="scoresScreen" class="menu" style="display: none;">
-        <img src="logo.png" style="width: 90%;" />
+    <div id="scoresScreen" class="menu" style="display:none">
+        <img src='logo.png' style='width:90%;' />
         <br>
         <br>
 
@@ -51,6 +51,7 @@
         <br>
         <button onclick="closeScores()">Back</button>
     </div>
+
 
     <div id="time"></div>
 </body>

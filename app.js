@@ -3,14 +3,14 @@ let CANVAS = null;
 let CONTEXT = null;
 let HELPER_CANVAS = null;
 let HELPER_CONTEXT = null;
-let SCALER = 0.8;
+let SCALER = 0.6;
 let SIZE = { x: 0, y: 0, width: 0, height: 0, rows: 3, columns: 3 };
 let PIECES = [];
 let SELECTED_PIECE = null;
 let START_TIME = null;
 let END_TIME = null;
 
-let POP_SOUND = new Audio("pop.flac");
+let POP_SOUND = new Audio("pop.mp3");
 POP_SOUND.volume = 0.1;
 
 let AUDIO_CONTEXT = new (AudioContext ||
@@ -30,9 +30,11 @@ function main() {
   HELPER_CANVAS = document.getElementById("helperCanvas");
   HELPER_CONTEXT = HELPER_CANVAS.getContext("2d");
 
-  addEventListener();
+  addEventListeners();
 
-  let promise = navigator.mediaDevices.getUserMedia({ video: true });
+  let promise = navigator.mediaDevices.getUserMedia({
+    video: true,
+  });
   promise
     .then(function (signal) {
       VIDEO = document.createElement("video");
@@ -41,7 +43,7 @@ function main() {
 
       VIDEO.onloadeddata = function () {
         handleResize();
-        // window.addEventListener("resize", handleResize);
+        //window.addEventListener('resize',handleResize);
         initializePieces(SIZE.rows, SIZE.columns);
         updateGame();
       };
@@ -70,7 +72,7 @@ function setDifficulty() {
 }
 
 function restart() {
-  START_TIME = new Data().getTime();
+  START_TIME = new Date().getTime();
   END_TIME = null;
   randomizePieces();
   document.getElementById("menuItems").style.display = "none";
@@ -113,7 +115,7 @@ function formatTime(milliseconds) {
   return formattedTime;
 }
 
-function addEventListener() {
+function addEventListeners() {
   CANVAS.addEventListener("mousedown", onMouseDown);
   CANVAS.addEventListener("mousemove", onMouseMove);
   CANVAS.addEventListener("mouseup", onMouseUp);
@@ -123,21 +125,13 @@ function addEventListener() {
 }
 
 function onTouchStart(evt) {
-  let loc = {
-    x: evt.touches[0].clientX,
-    y: evt.touches[0].clientY,
-  };
+  let loc = { x: evt.touches[0].clientX, y: evt.touches[0].clientY };
   onMouseDown(loc);
 }
-
 function onTouchMove(evt) {
-  let loc = {
-    x: evt.touches[0].clientX,
-    y: evt.touches[0].clientY,
-  };
+  let loc = { x: evt.touches[0].clientX, y: evt.touches[0].clientY };
   onMouseMove(loc);
 }
-
 function onTouchEnd() {
   onMouseUp();
 }
@@ -157,8 +151,7 @@ function onMouseDown(evt) {
     ")";
 
   SELECTED_PIECE = getPressedPieceByColor(evt, clickedColor);
-
-  SELECTED_PIECE = getPressedPiece(evt);
+  //SELECTED_PIECE=getPressedPiece(evt);
   if (SELECTED_PIECE != null) {
     const index = PIECES.indexOf(SELECTED_PIECE);
     if (index > -1) {
@@ -247,6 +240,7 @@ function updateGame() {
     PIECES[i].draw(CONTEXT);
     PIECES[i].draw(HELPER_CONTEXT, false);
   }
+
   updateTime();
   window.requestAnimationFrame(updateGame);
 }
@@ -255,7 +249,7 @@ function getRandomColor() {
   const red = Math.floor(Math.random() * 255);
   const green = Math.floor(Math.random() * 255);
   const blue = Math.floor(Math.random() * 255);
-  return "rgb9(" + red + "," + green + "," + blue + ")";
+  return "rgb(" + red + "," + green + "," + blue + ")";
 }
 
 function initializePieces(rows, cols) {
@@ -268,9 +262,9 @@ function initializePieces(rows, cols) {
     for (let j = 0; j < SIZE.columns; j++) {
       let color = getRandomColor();
       while (uniqueRandomColors.includes(color)) {
-        color = getPressedPiece();
+        color = getRandomColor();
       }
-      PIECES.push(new Piece(i, j));
+      PIECES.push(new Piece(i, j, color));
     }
   }
 
@@ -303,6 +297,7 @@ function initializePieces(rows, cols) {
       } else {
         piece.top = -PIECES[cnt - SIZE.columns].bottom;
       }
+
       cnt++;
     }
   }
@@ -337,17 +332,16 @@ class Piece {
     context.beginPath();
 
     const sz = Math.min(this.width, this.height);
-    const neck = 0.1 * sz;
-    const tabWidth = 0.2 * sz;
-    const tabHeight = 0.2 * sz;
+    const neck = 0.05 * sz;
+    const tabWidth = 0.3 * sz;
+    const tabHeight = 0.3 * sz;
 
-    // context.rect(this.x, this.y, this.width, this.height);
-    // FROM TOP LEFT
+    //context.rect(this.x,this.y,this.width,this.height);
+    //from top left
     context.moveTo(this.x, this.y);
-    // TO TOP RIGHT
+    //to top right
     if (this.top) {
       context.lineTo(this.x + this.width * Math.abs(this.top) - neck, this.y);
-
       context.bezierCurveTo(
         this.x + this.width * Math.abs(this.top) - neck,
         this.y - tabHeight * Math.sign(this.top) * 0.2,
@@ -372,13 +366,12 @@ class Piece {
     }
     context.lineTo(this.x + this.width, this.y);
 
-    // TO BOTTOM RIGHT
+    //to bottom right
     if (this.right) {
       context.lineTo(
         this.x + this.width,
         this.y + this.height * Math.abs(this.right) - neck
       );
-
       context.bezierCurveTo(
         this.x + this.width - tabHeight * Math.sign(this.right) * 0.2,
         this.y + this.height * Math.abs(this.right) - neck,
@@ -393,7 +386,7 @@ class Piece {
         this.x + this.width - tabHeight * Math.sign(this.right),
         this.y + this.height * Math.abs(this.right) + tabWidth,
 
-        this.x + this.height * Math.abs(this.right) * 0.2,
+        this.x + this.width - tabHeight * Math.sign(this.right) * 0.2,
         this.y + this.height * Math.abs(this.right) + neck,
 
         this.x + this.width,
@@ -402,7 +395,7 @@ class Piece {
     }
     context.lineTo(this.x + this.width, this.y + this.height);
 
-    // TO BOTTOM LEFT
+    //to bottom left
     if (this.bottom) {
       context.lineTo(
         this.x + this.width * Math.abs(this.bottom) + neck,
@@ -433,7 +426,7 @@ class Piece {
     }
     context.lineTo(this.x, this.y + this.height);
 
-    // TO TOP LEFT
+    //to top left
     if (this.left) {
       context.lineTo(this.x, this.y + this.height * Math.abs(this.left) + neck);
 
@@ -480,7 +473,7 @@ class Piece {
         VIDEO.videoWidth / SIZE.columns + scaledTabHeight * 2,
         VIDEO.videoHeight / SIZE.rows + scaledTabHeight * 2,
         this.x - tabHeight,
-        this.y - tabWidth,
+        this.y - tabHeight,
         this.width + tabHeight * 2,
         this.height + tabHeight * 2
       );
@@ -493,7 +486,6 @@ class Piece {
         this.height * tabHeight * 2
       );
     }
-
     context.restore();
 
     context.stroke();
@@ -529,9 +521,10 @@ function playNote(key, duration) {
   osc.frequency.value = key;
   osc.start(AUDIO_CONTEXT.currentTime);
   osc.stop(AUDIO_CONTEXT.currentTime + duration / 1000);
-  osc.type = "triangle";
+
   let envelope = AUDIO_CONTEXT.createGain();
   osc.connect(envelope);
+  osc.type = "triangle";
   envelope.connect(AUDIO_CONTEXT.destination);
   envelope.gain.setValueAtTime(0, AUDIO_CONTEXT.currentTime);
   envelope.gain.linearRampToValueAtTime(0.5, AUDIO_CONTEXT.currentTime + 0.1);
@@ -559,7 +552,7 @@ function playMelody() {
 }
 
 function showEndScreen() {
-  const time = Math.floor(END_TIME - START_TIME) / 1000;
+  const time = Math.floor((END_TIME - START_TIME) / 1000);
   document.getElementById("scoreValue").innerHTML = "Score: " + time;
   document.getElementById("endScreen").style.display = "block";
   document.getElementById("saveBtn").innerHTML = "Save";
@@ -593,7 +586,7 @@ function getScores() {
 
 function saveScore() {
   const time = END_TIME - START_TIME;
-  const name = document.getElementById("name".value);
+  const name = document.getElementById("name").value;
   if (name == "") {
     alert("Enter your name!");
     return;
@@ -601,7 +594,7 @@ function saveScore() {
   const difficulty = document.getElementById("difficulty").value;
 
   fetch(
-    'server.php?info={"name": "' +
+    'server.php?info={"name":"' +
       name +
       '",' +
       '"time":' +
@@ -613,21 +606,22 @@ function saveScore() {
   ).then(function (response) {
     document.getElementById("saveBtn").innerHTML = "OK!";
   });
+
   document.getElementById("saveBtn").disabled = true;
 }
 
 function formatScores(data) {
   let html = "<table style='width:100%;text-align:center;'>";
 
-  html += formatScoresTable(data["easy"], "Easy");
-  html += formatScoresTable(data["medium"], "Medium");
-  html += formatScoresTable(data["hard"], "Hard");
-  html += formatScoresTable(data["insane"], "Insane");
+  html += formatScoreTable(data["easy"], "Easy");
+  html += formatScoreTable(data["medium"], "Medium");
+  html += formatScoreTable(data["hard"], "Hard");
+  html += formatScoreTable(data["insane"], "Insane");
 
   return html;
 }
 
-function formatScoresTable(data, header) {
+function formatScoreTable(data, header) {
   let html = "<tr style='background:rgb(123,146,196);color:white'>";
   html += "<td></td><td><b>" + header + "</b></td><td><b>Time</b></td></tr>";
 
